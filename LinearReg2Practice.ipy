@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 26 14:07:49 2022
+
+@author: Nenchin
+"""
+
+import numpy as np
+import pandas as pd
+from sklearn import linear_model
+from word2number import w2n
+import math
+
+df = pd.read_csv('hiring.csv')
+#print(df)
+
+df.experience = df.experience.fillna('zero')
+df.experience = df.experience.apply(w2n.word_to_num)
+#print(df)
+
+median_test_score = math.floor(df['test_score'].median())
+#print(median_test_score)
+df.test_score = df.test_score.fillna(median_test_score)
+#print(df)
+
+model = linear_model.LinearRegression()
+model.fit(df[['experience','test_score','interview_score']], df.salary)
+
+model.coef_
+model.intercept_
+
+prd = model.predict([[2, 9, 6]])
+#print(prd)
+prd2 = model.predict([[12, 10, 10]])
+#print(prd2)
+
+'''import pickle
+with open('model_pickLG2', 'wb') as f:
+    pickle.dump(model,f)
+    
+with open('model_pickLG2', 'rb') as f:
+    mp = pickle.load(f)
+ANGRY1 = mp.predict([[15,10,10]])'''
+
+import joblib
+joblib.dump(model,'model_joblibLG2')
+
+md = joblib.load('model_joblibLG2')
+sms = md.predict([[15,10,10]])
